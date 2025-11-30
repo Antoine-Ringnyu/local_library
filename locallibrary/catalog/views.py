@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from .models import Book, Author, BookInstance, Genre
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 def index(request):
     """View function for home page of site."""
@@ -39,7 +40,7 @@ class BookListView(generic.ListView):
     model = Book
     paginate_by = 10
     # context_object_name = 'book_list'   # your own name for the list as a template variable
-    # # queryset = Book.objects.filter(title__icontains='war')[:5] # Get 5 books containing the title war
+    # # queryset = Book.objects.filter(title__ico tains='war')[:5] # Get 5 books containing the title war
     # queryset = Book.objects.all()  # Get all books
     # # template_name = 'catalog/book_list.html'  # Specify your own template name/location
     # template_name = 'books/my_arbitrary_template_name_list.html'  # Specify your own template name/location
@@ -56,3 +57,40 @@ class AuthorListView(generic.ListView):
 
 class AuthorDetailView(generic.DetailView):
     model = Author
+
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class LoanedBooksByUserListView(LoginRequiredMixin,generic.ListView):
+    """Generic class-based view listing books on loan to current user."""
+    model = BookInstance
+    template_name = 'catalog/bookinstance_list_borrowed_user.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return (
+            BookInstance.objects.filter(borrower=self.request.user)
+            .filter(status__exact='o')
+            .order_by('due_back')
+        )
+    
+class BorrowedBooksByUserListView(LoginRequiredMixin,generic.ListView):
+    """Generic class-based view listing books on loan to current user."""
+    model = BookInstance
+
+    permission_required = (
+        'catalog.can_mark_returned', 
+        # 'catalog.change_book'
+    )
+
+    template_name = 'catalog/bookinstance_list_borrowed_books.html'
+    paginate_by = 10
+
+
+
+    def get_queryset(self):
+        return (
+            BookInstance.objects
+            .filter(status__exact='o')
+            .order_by('due_back')
+        )
