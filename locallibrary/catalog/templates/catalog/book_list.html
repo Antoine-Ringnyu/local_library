@@ -1,17 +1,25 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-  <h1>Book List</h1>
+  <div class="card p-3">
+    <h1 class="mb-5">Book List</h1>
   {% if book_list %}
-    <ul>
+
+    <ul class="list-group">
       {% for book in book_list %}
-      <li>
-        <a href="{{ book.get_absolute_url }}">{{ book.title }}</a>
-        ({{book.author}})
-      </li>
-      {% endfor %}
+     
+        <a class=" list-group-item list-group-item-action" href="{{ book.get_absolute_url }}">
+          <div class="d-flex w-100 justify-content-between">
+            {{ book.title }} - ({{book.author}})
+            <small class="text-muted bg-light p-1">{{book.bookinstance_set.count}} copies</small>
+          </div>
+        </a>
+        
+
+      {% endfor %} 
     </ul>
   {% else %}
     <p>There are no books in the library.</p>
   {% endif %}
+  </div>
 {% endblock %}
