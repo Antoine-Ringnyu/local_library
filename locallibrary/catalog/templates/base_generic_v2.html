@@ -17,22 +17,16 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <!-- Add additional CSS in static file -->
     {% load static %}
-    {% load nav_active %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
     <style>
     /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
     .row.content {height: 550px}
     
     /* Set gray background color and 100% height */
-    .nav-pills .nav-link.active {
-      background-color: #474747 !important;
-      color: #fff !important;
+    .sidenav {
+      background-color: #f1f1f1;
+      height: 100%;
     }
-    a.nav-link {
-      color: #474747 !important;
-      font-weight: bold;
-    }
-
         
     /* On small screens, set height to 'auto' for the grid */
     @media screen and (max-width: 767px) {
@@ -41,24 +35,43 @@
   </style>
   </head>
   <body>
-    <div class="container-lg mt-5">
-        
+    <div class="container-lg">
+        <nav class="navbar navbar-inverse visible-xs">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>                        
+                </button>
+                <a class="navbar-brand" href="#">Logo</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Dashboard</a></li>
+                    <li><a href="#">Age</a></li>
+                    <li><a href="#">Gender</a></li>
+                    <li><a href="#">Geo</a></li>
+                </ul>
+                </div>
+            </div>
+        </nav>
       <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-2">
           {% block sidebar %}
-            <ul class="nav nav-pills card bg-light p-3 mb-3 ">
+            <ul class="sidebar-nav">
                 
-              <li class="nav-item"><a class="nav-link {% active 'index' %}" href="{% url 'index' %}">Home</a></li>
-              <li class="nav-item"><a class="nav-link {% active 'books' %}" href="{% url 'books' %}">All books</a></li>
-              <li class="nav-item"><a class="nav-link {% active 'authors' %}" href="{% url 'authors' %}">All authors</a></li>
+              <li class=""><a href="{% url 'index' %}">Home</a></li>
+              <li class=""><a href="{% url 'books' %}">All books</a></li>
+              <li class=""><a href="{% url 'authors' %}">All authors</a></li>
 
               <br>
               {% if user.is_authenticated %}
-                <li class="nav-item">User: {{ user.get_username }}</li>
+                <li>User: {{ user.get_username }}</li>
 
-                <li class="nav-item"><a class="nav-link {% active 'my-borrowed' %}" href="{% url 'my-borrowed' %}">My Borrowed</a></li>
+                <li><a href="{% url 'my-borrowed' %}">My Borrowed</a></li>
 
-                <li class="nav-item">
+                <li>
                     <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-link">Logout</button>
@@ -70,26 +83,26 @@
                 {% endif %} -->
                 {% if user.is_staff %}
                     <hr>
-                  
+                    <ul class="sidebar-nav">
                     <li>Staff</li>
-                    <li class="nav-item"><a class="nav-link {% active 'borrowed-books' %}" href="{% url 'borrowed-books' %}">All borrowed</a></li>
+                    <li><a href="{% url 'borrowed-books' %}">All borrowed</a></li>
                     {% if perms.catalog.add_author %}
-                      <li class="nav-item"><a class="nav-link {% active 'author-create' %}" href="{% url 'author-create' %}">Create author</a></li>
+                    <li><a href="{% url 'author-create' %}">Create author</a></li>
                     {% endif %}
                     {% if perms.catalog.add_book %}
-                      <li class="nav-item"><a class="nav-link {% active 'book-create' %}" href="{% url 'book-create' %}">Create book</a></li>
+                    <li><a href="{% url 'book-create' %}">Create book</a></li>
                     {% endif %}
-                 
+                    </ul>
                     {% endif %}
                 {% else %}
-                    <li><a class="nav-link {% active 'login' %}" href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
+                    <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>
                 {% endif %}
 
 
             </ul>
           {% endblock %}
         </div>
-        <div class="col-sm-9 ">
+        <div class="col-sm-10 ">
             {% block content %}{% endblock %}
             {% block pagination %}
                 {% if is_paginated %}
