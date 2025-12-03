@@ -174,7 +174,7 @@ class AuthorDelete(PermissionRequiredMixin, DeleteView):
 
 
 
-from .models import Book
+from .models import Book, BookInstance
 class BookCreate(PermissionRequiredMixin, CreateView):
     model = Book
     fields = ['title', 'author', 'summary', 'isbn', 'genre', 'language']
@@ -199,3 +199,40 @@ class BookDelete(PermissionRequiredMixin, DeleteView):
             return HttpResponseRedirect(
                 reverse("book-delete", kwargs={"pk": self.object.pk})
             )
+        
+
+class BookInstanceCreate(PermissionRequiredMixin, CreateView):
+    model = BookInstance
+    fields = ['book', 'imprint', 'due_back', 'status', 'borrower']
+    permission_required = 'catalog.add_bookinstance'
+
+class BookInstanceUpdate(PermissionRequiredMixin, UpdateView):
+    model = BookInstance
+    # Not recommended (potential security issue if more fields added)
+    fields = '__all__'
+    permission_required = 'catalog.change_bookinstance'
+
+class BookInstanceDelete(PermissionRequiredMixin, DeleteView):
+    model = BookInstance
+    success_url = reverse_lazy('books')
+    permission_required = 'catalog.delete_bookinstance'
+
+    def form_valid(self, form):
+        try:
+            self.object.delete()
+            return HttpResponseRedirect(self.success_url)
+        except Exception as e:
+            return HttpResponseRedirect(
+                reverse("bookinstance-delete", kwargs={"pk": self.object.pk})
+            )
+        
+
+@login_required
+@permission_required('catalog.change_book', raise_exception=True)
+def mark_book_as_read(request, pk):
+    """View function to mark a book as read."""
+    book = get_object_or_404(Book, pk=pk)
+    # toggle the has_read field
+    book.has_read = not book.has_read
+    book.save()
+    return HttpResponseRedirect(reverse('book-detail', args=[str(book.id)]))

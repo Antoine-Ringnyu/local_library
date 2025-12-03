@@ -53,6 +53,7 @@ class Book(models.Model):
     genre = models.ManyToManyField(
         Genre, help_text="Select a genre for this book")
     language = models.ForeignKey('Language', on_delete=models.RESTRICT, null=True)
+    has_read = models.BooleanField(default=False)
 
     def __str__(self):
         """String for representing the Model object."""
@@ -101,13 +102,18 @@ class BookInstance(models.Model):
         null=True, 
         blank=True
     )
+    
 
+    def get_absolute_url(self):
+        """Returns the URL to access a particular book instance."""
+        return reverse('book-detail', args=[str(self.book.id)])
     class Meta:
         ordering = ['due_back']
         permissions = (
             ("can_mark_returned", "Set book as returned"),
             ("can_borrow", "Borrow book"),
         )
+
 
     def __str__(self):
         """String for representing the Model object."""

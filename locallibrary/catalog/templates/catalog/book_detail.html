@@ -20,8 +20,15 @@
 
 
 {% block content %}
-  <div class="card bg-light p-3 mb-3">
+  <div class="card bg-light p-3 mb-2">
     <h1>Title: {{ book.title }}</h1>
+    {% if perms.catalog.change_book %}
+      {% if book.has_read %}
+        <a href="{% url 'book-mark-as-read' book.id %}" class="btn btn-success mb-2">Mark as Unread</a>
+      {% else %}
+        <a href="{% url 'book-mark-as-read' book.id %}" class="btn btn-secondary mb-2">Mark as Read</a>
+      {%  endif %}
+    {% endif %}
 
   <p><strong>Author:</strong> <a href="{{ book.author.get_absolute_url }}">{{ book.author }}</a></p>
   <!-- author detail link not yet defined -->
@@ -31,6 +38,19 @@
   <p><strong>Genre:</strong> {{ book.genre.all|join:", " }}</p>
 
 </div>
+
+<!-- ACTION BAR -->
+ <div class="row p-3 mb-3">
+    {% if perms.catalog.change_book %}
+      <a href="{% url 'book-update' book.id %}" class="btn btn-secondary">Edit Book</a>
+    {% endif %}
+    {% if perms.catalog.change_bookinstance %}
+      <a href="{% url 'bookinstance-create' %}?book={{ book.id }}" class="btn btn-secondary">Add Copy</a>
+    {% endif %}
+    {% if perms.catalog.delete_book %}
+      <a href="{% url 'book-delete' book.id %}" class="btn btn-danger">Delete Book</a>
+    {% endif %}
+ </div>
 
 <div class="card">
   <div class="card-header ">
@@ -50,6 +70,12 @@
     {% endif %}
     <p><strong>Imprint:</strong> {{ copy.imprint }}</p>
     <p class="text-muted"><strong>Id:</strong> {{ copy.id }}</p>
+    {% if perms.catalog.change_bookinstance %}
+      <a href="{% url 'bookinstance-update' copy.id %}">Edit copy</a> |
+    {% endif %}
+    {% if perms.catalog.delete_bookinstance %}
+      <a href="{% url 'bookinstance-delete' copy.id %}">Delete copy</a>
+    {% endif %}
     </div>
   {% endfor %}
 </div>
